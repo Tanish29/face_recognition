@@ -1,5 +1,7 @@
 # folders
 papers/
+.vscode/
 
 # files
 *.docx
+scratch.py
