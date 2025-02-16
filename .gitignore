@@ -1,6 +1,7 @@
 # folders
 papers/
 .vscode/
+__pycache__/
 
 # files
 *.docx
