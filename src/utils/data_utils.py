@@ -1,10 +1,11 @@
 from enum import Enum
-from datasets import *
+from torch.utils.data import Dataset
+from .datasets import *
 
 class DATASET_NAMES(Enum):
-    celeba = 0
+    CELEBA = 0
 
-def get_dataset(dataset_name: DATASET_NAMES):
+def get_dataset(dataset_name: DATASET_NAMES, image_dir: str, annotation_file: str) -> Dataset:
     """
     Returns the train, validation and test split from the given dataset
 
@@ -16,8 +17,6 @@ def get_dataset(dataset_name: DATASET_NAMES):
         raise ValueError(f"Provided dataset name is invalid, choose from these set of enums: {available_names}")
     
     if dataset_name == DATASET_NAMES.CELEBA: # celeba dataset 
-        train_df, val_df, test_df = celeba()
+        dataset = celeba(image_dir, annotation_file)
 
-
-    return train_df, val_df, test_df
-
+    return dataset

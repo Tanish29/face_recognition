@@ -1,11 +1,13 @@
 from torch.utils.data import Dataset
 from torchvision.io import read_image
+
 import os
+import numpy as np
 
 class celeba(Dataset):
     def __init__(self, image_dir, annotation_file, transform=None, target_transform=None) -> None:
         self.image_dir = image_dir
-        self.image_labels = annotation_file
+        self.image_labels = np.loadtxt(annotation_file, dtype=str)
         self.transform = transform
         self.target_transform = target_transform
     
@@ -14,10 +16,10 @@ class celeba(Dataset):
     
     def __getitem__(self, index):
         image_name = os.listdir(self.image_dir)[index]
-        full_path = os.join.path(self.image_dir, image_name)
+        full_path = os.path.join(self.image_dir, image_name)
 
         image = read_image(full_path) # read image as tensor
-        label = self.image_labels[index] # get person's identity
+        label = int(self.image_labels[index,1]) # get person's identity (images and annotations are ordered)
 
         if self.transform:
             image = self.transform(image)
@@ -25,5 +27,3 @@ class celeba(Dataset):
             label = self.target_transform(label)
 
         return image, label
-
-    
