@@ -10,7 +10,9 @@ def get_dataset(dataset_name: DATASET_NAMES, image_dir: str, annotation_file: st
     Returns the train, validation and test split from the given dataset
 
     Args:
-        dataset_name: name of the dataset to load, used to call relevant function. 
+        dataset_name: name of the dataset to load, used to call relevant function.
+        image_dir: path to directory containing images 
+        annotation_file: path to the annotation/label file 
     """
     if dataset_name not in DATASET_NAMES:
         available_names = [enum.name for enum in DATASET_NAMES]

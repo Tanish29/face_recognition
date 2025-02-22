@@ -12,9 +12,15 @@ class celeba(Dataset):
         self.target_transform = target_transform
     
     def __len__(self):
+        '''
+        Returns the number of images 
+        '''
         return len(os.listdir(self.image_dir))
     
     def __getitem__(self, index):
+        '''
+        Retrieves the image and annotation at given index
+        '''
         image_name = os.listdir(self.image_dir)[index]
         full_path = os.path.join(self.image_dir, image_name)
 
