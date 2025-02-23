@@ -2,6 +2,7 @@
 papers/
 .vscode/
 __pycache__/
+configs/
 
 # files
 *.docx
