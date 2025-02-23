@@ -3,11 +3,12 @@ from torchvision.io import read_image
 
 import os
 import numpy as np
-
+        
 class celeba(Dataset):
+    '''CelebA dataset'''
     def __init__(self, image_dir, annotation_file, transform=None, target_transform=None) -> None:
         self.image_dir = image_dir
-        self.image_labels = np.loadtxt(annotation_file, dtype=str)
+        self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
         self.transform = transform
         self.target_transform = target_transform
     
