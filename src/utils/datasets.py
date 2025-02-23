@@ -6,8 +6,10 @@ import numpy as np
         
 class celeba(Dataset):
     '''CelebA dataset'''
-    def __init__(self, image_dir, annotation_file, transform=None, target_transform=None) -> None:
+    def __init__(self, image_dir, annotation_file, reduce_size_to:float = 1.0, transform=None, target_transform=None) -> None:
         self.image_dir = image_dir
+        self.image_names = os.listdir(image_dir)
+        self.image_names = np.random.choice(self.image_names, size=int(reduce_size_to*len(self.image_names)), replace=False)
         self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
         self.transform = transform
         self.target_transform = target_transform
@@ -16,13 +18,13 @@ class celeba(Dataset):
         '''
         Returns the number of images 
         '''
-        return len(os.listdir(self.image_dir))
+        return len(self.image_names)
     
     def __getitem__(self, index):
         '''
         Retrieves the image and annotation at given index
         '''
-        image_name = os.listdir(self.image_dir)[index]
+        image_name = self.image_names[index]
         full_path = os.path.join(self.image_dir, image_name)
 
         image = read_image(full_path) # read image as tensor
