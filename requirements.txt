@@ -5,3 +5,5 @@ numpy
 ipython 
 ipykernel
 pyyaml
+plotly
+nbformat>=4.2.0

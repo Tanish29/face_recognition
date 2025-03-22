@@ -1,6 +1,8 @@
 from enum import Enum
 from torch.utils.data import Dataset, random_split
 from .datasets import *
+import plotly.express as px
+import cv2
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
@@ -19,9 +21,9 @@ def get_dataset(dataset_name: DATASET_NAMES,
         dataset_name: name of the dataset to load, used to call relevant function.
         image_dir: path to directory containing images 
         annotation_file: path to the annotation/label file 
-        reduce_size_to: proportional of the whole dataset to keep (use arg if dataset is very large)
-        train_test_split: proportional of whole dataset to use for training (e.g., 0.8 means 80% of dataset for training data)
-        train_val_split: proportional of training data to use for validation
+        reduce_size_to: proportion of the whole dataset to keep (use arg if dataset is very large)
+        train_test_split: proportion of whole dataset to use for training (e.g., 0.8 means 80% of dataset for training data)
+        train_val_split: proportion of training data to use for validation
     """
     if dataset_name not in DATASET_NAMES:
         available_names = [enum.name for enum in DATASET_NAMES]
@@ -39,3 +41,31 @@ def get_dataset(dataset_name: DATASET_NAMES,
         train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
 
     return train_df, val_df, test_df
+
+def view_dataset(dataset: Dataset, resize_res: int, num_show: int, shuffle: bool):
+    num_images = len(dataset)
+    if num_show==-1: num_show = num_images
+
+    if shuffle:
+        indices = np.random.randint(0, num_images, num_show)
+    else:
+        indices = range(num_show)
+
+    for counter, idx in enumerate(indices):
+        print(f"Plotting image {counter+1}/{num_show}")
+        image_id = dataset[idx]
+        image_np = image_id[0].permute(1,2,0).cpu().numpy()
+        image_np = cv2.resize(image_np, [resize_res]*2)
+        image_np = np.expand_dims(image_np, axis=0)
+        # face_id = image_id[1]
+
+        if counter == 0:
+            images_np = image_np
+        else:
+            images_np = np.concat([image_np, images_np], axis=0)
+    
+    fig = px.imshow(images_np, 
+                    animation_frame=0, 
+                    title=f"Viewing {num_show} images from the given dataset")
+
+    fig.show()
