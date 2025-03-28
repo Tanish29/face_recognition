@@ -3,6 +3,7 @@ from torch.utils.data import Dataset, random_split
 from .datasets import *
 import plotly.express as px
 import cv2
+from tqdm import tqdm
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
@@ -51,13 +52,16 @@ def view_dataset(dataset: Dataset, resize_res: int, num_show: int, shuffle: bool
     else:
         indices = range(num_show)
 
-    for counter, idx in enumerate(indices):
-        print(f"Plotting image {counter+1}/{num_show}")
+    num_cols = 5
+    face_ids = []
+    print(f"Plotting Images")
+    for counter, idx in enumerate(tqdm(indices, total=len(indices))):
+        # print(f"Plotting image {counter+1}/{num_show}")
         image_id = dataset[idx]
         image_np = image_id[0].permute(1,2,0).cpu().numpy()
         image_np = cv2.resize(image_np, [resize_res]*2)
         image_np = np.expand_dims(image_np, axis=0)
-        # face_id = image_id[1]
+        face_ids.append(image_id[1])
 
         if counter == 0:
             images_np = image_np
@@ -67,5 +71,8 @@ def view_dataset(dataset: Dataset, resize_res: int, num_show: int, shuffle: bool
     fig = px.imshow(images_np, 
                     animation_frame=0, 
                     title=f"Viewing {num_show} images from the given dataset")
+    fig.update_layout(xaxis_visible=False,
+                      yaxis_visible=False)
+    # for i in range(10): fig.layout.annotations[i]["text"] = f"id: {face_ids[i]}"
 
     fig.show()
