@@ -70,7 +70,7 @@ def view_dataset(dataset:Dataset,
         if counter == 0:
             images_np = image_np
         else:
-            images_np = np.concat([image_np, images_np], axis=0)
+            images_np = np.concatenate([image_np, images_np], axis=0)
     
     fig = px.imshow(images_np, 
                     animation_frame=0, 
