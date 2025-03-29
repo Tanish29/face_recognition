@@ -8,12 +8,13 @@ from tqdm import tqdm
 class DATASET_NAMES(Enum):
     CELEBA = 0
 
-def get_dataset(dataset_name: DATASET_NAMES, 
-                image_dir: str, 
-                annotation_file: str,
-                reduce_size_to: float = 1.0,
-                train_test_split: float = 0.8,
-                train_val_split: float = 0.8,
+def get_dataset(dataset_name:DATASET_NAMES, 
+                image_dir:str, 
+                annotation_file:str,
+                reduce_size_to:float,
+                train_test_split:float,
+                train_val_split:float,
+                preprocessor:callable
                 ) -> Dataset:
     """
     Returns the train, validation and test split from the given dataset
@@ -38,12 +39,15 @@ def get_dataset(dataset_name: DATASET_NAMES,
 
 
     if dataset_name == DATASET_NAMES.CELEBA: # celeba dataset 
-        dataset = celeba(image_dir, annotation_file, reduce_size_to)
+        dataset = celeba(image_dir, annotation_file, reduce_size_to, preprocessor)
         train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
 
     return train_df, val_df, test_df
 
-def view_dataset(dataset: Dataset, resize_res: int, num_show: int, shuffle: bool):
+def view_dataset(dataset:Dataset, 
+                 resize_res:int, 
+                 num_show:int, 
+                 shuffle:bool):
     num_images = len(dataset)
     if num_show==-1: num_show = num_images
 
@@ -58,7 +62,7 @@ def view_dataset(dataset: Dataset, resize_res: int, num_show: int, shuffle: bool
     for counter, idx in enumerate(tqdm(indices, total=len(indices))):
         # print(f"Plotting image {counter+1}/{num_show}")
         image_id = dataset[idx]
-        image_np = image_id[0].permute(1,2,0).cpu().numpy()
+        image_np = image_id[0]
         image_np = cv2.resize(image_np, [resize_res]*2)
         image_np = np.expand_dims(image_np, axis=0)
         face_ids.append(image_id[1])
