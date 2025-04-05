@@ -1,5 +1,5 @@
 from enum import Enum
-from torch.utils.data import Dataset, random_split
+from torch.utils.data import Dataset, random_split, DataLoader
 from .datasets import *
 import plotly.express as px
 import cv2
@@ -30,19 +30,25 @@ def get_dataset(dataset_name:DATASET_NAMES,
     if dataset_name not in DATASET_NAMES:
         available_names = [enum.name for enum in DATASET_NAMES]
         raise ValueError(f"Provided dataset name is invalid, choose from these set of enums: {available_names}")
-    
 
     # get train, val, test sizes
     train_prop = train_val_split * train_test_split
     val_prop = (1 - train_val_split) * train_test_split
     test_prop = 1 - train_test_split
 
-
     if dataset_name == DATASET_NAMES.CELEBA: # celeba dataset 
         dataset = celeba(image_dir, annotation_file, reduce_size_to, preprocessor)
         train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
 
     return train_df, val_df, test_df
+
+def get_dataloaders(batch_size,*datasets):
+    loaders = []
+    for dataset in datasets:
+        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        loaders.append(loader)
+    
+    return loaders
 
 def view_dataset(dataset:Dataset,
                  num_show:int, 
