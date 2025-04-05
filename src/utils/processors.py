@@ -3,6 +3,9 @@ import cv2
 from mediapipe.python.solutions.face_detection import *
 from enum import Enum
 
+normalisation_mean = (0.485, 0.456, 0.406)
+normalisation_std = (0.229, 0.224, 0.225)
+
 class DETECTOR_NAMES(Enum):
     MEDIAPIPE = "mediapipe"
     HAARCASCADE = "haarcascade"
@@ -26,6 +29,9 @@ class preprocessor():
         # resize
         resize_res = self.args["resize_res"]
         image = cv2.resize(image, (resize_res,resize_res), interpolation=cv2.INTER_AREA) # reduced alising effects
+
+        # normalise 
+        image = normalise(image, normalisation_mean, normalisation_std) # imagenet mean/std
         
         return image
     
@@ -76,3 +82,11 @@ def haarcascade_crop_image(image, classifer_path):
         image = image[y:y+h, x:x+w]
     
     return image
+
+
+def normalise(image, mean, std):
+    '''does min-max then z-score normalisation'''
+    return (image/255-mean)/std
+
+def unnormalise(image, mean, std):
+    return (image*std + mean)*255

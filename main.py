@@ -22,6 +22,9 @@ annotation_file = config['label_file']
 preprocessor_args = proc.get_preprocessor_args(DETECTOR,RESIZE_RES)
 preprocessor = proc.preprocessor(preprocessor_args)
 
+''' AUGMENTATIONS '''
+# transform = 
+
 ''' GET DATASET '''
 dataset_name = du.DATASET_NAMES.CELEBA
 args = {

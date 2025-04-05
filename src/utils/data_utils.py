@@ -4,6 +4,7 @@ from .datasets import *
 import plotly.express as px
 import cv2
 from tqdm import tqdm
+from . import processors as proc
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
@@ -68,6 +69,7 @@ def view_dataset(dataset:Dataset,
     for counter, idx in enumerate(tqdm(indices, total=len(indices))):
         image_id = dataset[idx]
         image_np = image_id[0]
+        image_np = proc.unnormalise(image_np, proc.normalisation_mean, proc.normalisation_std)
         image_np = np.expand_dims(image_np, axis=0)
         face_ids.append(image_id[1])
 
