@@ -3,21 +3,23 @@ import yaml
 from src.utils import data_utils as du
 from src.utils import processors as proc
 
-''' LOAD CONFIGURATIONS '''
+''' GLOBAL VARIABLES '''
+TRAIN_TEST_SPLIT = 0.8
+TRAIN_VAL_SPLIT = 0.8
+REDUCE_SIZE_TO = 0.10
+DETECTOR = proc.DETECTOR_NAMES.MEDIAPIPE
+RESIZE_RES = 512
+
+''' LOAD CONFIGURATION FILE '''
 with open("configs/config.yml", "r") as file: # load config file
     config = yaml.safe_load(file)  
 
-# create variables
-image_dir = config['image_dir']
+image_dir = config['image_dir'] # non-platform agnostic
 annotation_file = config['label_file']
-reduce_size_to = config['reduce_size_to']
-train_test_split = config['train_test_split']
-train_val_split = config['train_val_split']
 
 ''' PREPROCESS '''
-detection_model = proc.DETECTOR_NAMES.MEDIAPIPE
-detection_args = proc.get_detection_model_args(detection_model)
-preprocessor = proc.preprocessor(detection_model, detection_args)
+preprocessor_args = proc.get_preprocessor_args(DETECTOR,RESIZE_RES)
+preprocessor = proc.preprocessor(preprocessor_args)
 
 ''' IMPORT DATASET '''
 dataset_name = du.DATASET_NAMES.CELEBA
@@ -25,12 +27,12 @@ args = {
     "dataset_name":dataset_name,
     "image_dir":image_dir,
     "annotation_file":annotation_file,
-    "reduce_size_to":reduce_size_to,
-    "train_test_split":train_test_split,
-    "train_val_split":train_val_split,
+    "reduce_size_to":REDUCE_SIZE_TO,
+    "train_test_split":TRAIN_TEST_SPLIT,
+    "train_val_split":TRAIN_VAL_SPLIT,
     "preprocessor":preprocessor
 }
 train_df, val_df, test_df = du.get_dataset(**args)
 
 ''' VIEW DATASET '''
-du.view_dataset(train_df, resize_res=512, num_show=10, shuffle=True)
+du.view_dataset(train_df, num_show=10, shuffle=True, df="Train")

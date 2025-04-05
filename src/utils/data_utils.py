@@ -44,10 +44,10 @@ def get_dataset(dataset_name:DATASET_NAMES,
 
     return train_df, val_df, test_df
 
-def view_dataset(dataset:Dataset, 
-                 resize_res:int, 
+def view_dataset(dataset:Dataset,
                  num_show:int, 
-                 shuffle:bool):
+                 shuffle:bool,
+                 df:str):
     num_images = len(dataset)
     if num_show==-1: num_show = num_images
 
@@ -60,10 +60,8 @@ def view_dataset(dataset:Dataset,
     face_ids = []
     print(f"Plotting Images")
     for counter, idx in enumerate(tqdm(indices, total=len(indices))):
-        # print(f"Plotting image {counter+1}/{num_show}")
         image_id = dataset[idx]
         image_np = image_id[0]
-        image_np = cv2.resize(image_np, [resize_res]*2)
         image_np = np.expand_dims(image_np, axis=0)
         face_ids.append(image_id[1])
 
@@ -74,7 +72,7 @@ def view_dataset(dataset:Dataset,
     
     fig = px.imshow(images_np, 
                     animation_frame=0, 
-                    title=f"Viewing {num_show} images from the given dataset")
+                    title=f"Viewing {num_show} images from {df} dataset")
     fig.update_layout(xaxis_visible=False,
                       yaxis_visible=False)
     # for i in range(10): fig.layout.annotations[i]["text"] = f"id: {face_ids[i]}"
