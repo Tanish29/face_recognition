@@ -2,9 +2,9 @@ from enum import Enum
 from torch.utils.data import Dataset, random_split, DataLoader
 from .datasets import *
 import plotly.express as px
-import cv2
 from tqdm import tqdm
 from . import processors as proc
+import albumentations as abm
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
@@ -15,7 +15,8 @@ def get_dataset(dataset_name:DATASET_NAMES,
                 reduce_size_to:float,
                 train_test_split:float,
                 train_val_split:float,
-                preprocessor:callable
+                preprocessor:callable,
+                transform:abm.Compose
                 ) -> Dataset:
     """
     Returns the train, validation and test split from the given dataset
@@ -39,7 +40,9 @@ def get_dataset(dataset_name:DATASET_NAMES,
 
     if dataset_name == DATASET_NAMES.CELEBA: # celeba dataset 
         dataset = celeba(image_dir, annotation_file, reduce_size_to, preprocessor)
-        train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
+
+    train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
+    train_df = datasetWithTransform(train_df, transform)
 
     return train_df, val_df, test_df
 
@@ -54,7 +57,7 @@ def get_dataloaders(batch_size,*datasets):
 def view_dataset(dataset:Dataset,
                  num_show:int, 
                  shuffle:bool,
-                 df:str):
+                 df_name:str):
     num_images = len(dataset)
     if num_show==-1: num_show = num_images
 
@@ -68,10 +71,10 @@ def view_dataset(dataset:Dataset,
     print(f"Plotting Images")
     for counter, idx in enumerate(tqdm(indices, total=len(indices))):
         image_id = dataset[idx]
-        image_np = image_id[0]
+        image_np = image_id[0].permute(1,2,0).cpu().numpy()
         image_np = proc.unnormalise(image_np, proc.normalisation_mean, proc.normalisation_std)
         image_np = np.expand_dims(image_np, axis=0)
-        face_ids.append(image_id[1])
+        # face_ids.append(image_id[1])
 
         if counter == 0:
             images_np = image_np
@@ -80,7 +83,7 @@ def view_dataset(dataset:Dataset,
     
     fig = px.imshow(images_np, 
                     animation_frame=0, 
-                    title=f"Viewing {num_show} images from {df} dataset")
+                    title=f"Viewing {num_show} images from {df_name} dataset")
     fig.update_layout(xaxis_visible=False,
                       yaxis_visible=False)
     # for i in range(10): fig.layout.annotations[i]["text"] = f"id: {face_ids[i]}"

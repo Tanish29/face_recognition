@@ -2,6 +2,12 @@ import numpy as np
 import cv2
 from mediapipe.python.solutions.face_detection import *
 from enum import Enum
+import torch 
+import yaml
+
+with open("configs/config.yml", "r") as file: # load config file
+    config = yaml.safe_load(file)  
+    device = config['device']
 
 normalisation_mean = (0.485, 0.456, 0.406)
 normalisation_std = (0.229, 0.224, 0.225)
@@ -52,7 +58,7 @@ def mediapipe_crop_image(image, detection_confidence, model_type):
     results = face_detector.process(image)
     faces = results.detections
 
-    if len(faces) == 0:
+    if faces is None:
         print(f"Log: No faces detected returning unchanged image")
         return image
     
@@ -83,10 +89,15 @@ def haarcascade_crop_image(image, classifer_path):
     
     return image
 
-
 def normalise(image, mean, std):
     '''does min-max then z-score normalisation'''
     return (image/255-mean)/std
 
 def unnormalise(image, mean, std):
     return (image*std + mean)*255
+
+def to_tensor(image, kwargs=None):
+    if kwargs:
+        return torch.tensor(image, device=device, **kwargs)
+    
+    return torch.tensor(image, device=device)

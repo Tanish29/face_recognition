@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from torchvision.io import read_image
+from . import processors as proc
 
 import os
 import numpy as np
@@ -11,14 +11,12 @@ class celeba(Dataset):
                  image_dir:str, 
                  annotation_file:str, 
                  reduce_size_to:int, 
-                 preprocessor:callable, 
-                 transform=None) -> None:
+                 preprocessor:callable) -> None:
         self.image_dir = image_dir
         self.image_names = os.listdir(image_dir)
         self.image_names = np.random.choice(self.image_names, size=int(reduce_size_to*len(self.image_names)), replace=False)
         self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
         self.preprocessor = preprocessor
-        self.transform = transform
     
     def __len__(self):
         '''
@@ -37,7 +35,27 @@ class celeba(Dataset):
         label = int(self.image_labels[index,1]) # get person's identity (images and annotations are ordered)
 
         image = self.preprocessor(image)
-        if self.transform:
-            image = self.transform(image)
+
+        image = proc.to_tensor(image).permute(2,0,1)
+        label = proc.to_tensor(label)
+
+        return image, label
+    
+    def set_transform(self, transform):
+        self.transform = transform
+
+class datasetWithTransform(Dataset):
+    def __init__(self, dataset, transform):
+        self.dataset = dataset
+        self.transform = transform
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, index):
+        image, label = self.dataset[index]
+        image = image.permute(1,2,0).cpu().numpy()
+        image = self.transform(image=image)['image']
+        image = proc.to_tensor(image).permute(2,0,1)
 
         return image, label
