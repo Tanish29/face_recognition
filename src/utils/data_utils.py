@@ -73,6 +73,8 @@ def view_dataset(dataset:Dataset,
         image_id = dataset[idx]
         image_np = image_id[0].permute(1,2,0).cpu().numpy()
         image_np = proc.unnormalise(image_np, proc.normalisation_mean, proc.normalisation_std)
+        # this is to convert all constant padding to black color however will not work if image contains black color
+        image_np[image_np==proc.unnormalise(np.array([0,0,0]),proc.normalisation_mean,proc.normalisation_std)] = 0 
         image_np = np.expand_dims(image_np, axis=0)
         # face_ids.append(image_id[1])
 

@@ -44,5 +44,5 @@ train_df, val_df, test_df = du.get_dataset(**args)
 train_dl, val_dl, test_dl = du.get_dataloaders(BATCH_SIZE,train_df,val_df,test_df)
 
 ''' VIEW DATASET '''
-du.view_dataset(train_df, num_show=10, shuffle=True, df_name="Train")
+du.view_dataset(train_df, num_show=10, shuffle=False, df_name="Train")
 du.view_dataset(val_df, num_show=10, shuffle=True, df_name="val")
