@@ -35,9 +35,6 @@ class preprocessor():
         # resize
         resize_res = self.args["resize_res"]
         image = cv2.resize(image, (resize_res,resize_res), interpolation=cv2.INTER_AREA) # reduced alising effects
-
-        # normalise 
-        image = normalise(image, normalisation_mean, normalisation_std) # imagenet mean/std
         
         return image
     
