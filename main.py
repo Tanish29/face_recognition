@@ -36,7 +36,7 @@ args = {
     "train_test_split":TRAIN_TEST_SPLIT,
     "train_val_split":TRAIN_VAL_SPLIT,
     "preprocessor":preprocessor,
-    "transform":transform
+    "transform":None
 }
 train_df, val_df, test_df = du.get_dataset(**args)
 

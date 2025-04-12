@@ -4,7 +4,8 @@ from .datasets import *
 import plotly.express as px
 from tqdm import tqdm
 from . import processors as proc
-import albumentations as abm
+from albumentations import Compose
+from typing import Optional
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
@@ -16,7 +17,7 @@ def get_dataset(dataset_name:DATASET_NAMES,
                 train_test_split:float,
                 train_val_split:float,
                 preprocessor:callable,
-                transform:abm.Compose
+                transform:Optional[Compose]
                 ) -> Dataset:
     """
     Returns the train, validation and test split from the given dataset

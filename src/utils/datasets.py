@@ -4,6 +4,8 @@ from . import processors as proc
 import os
 import numpy as np
 import cv2
+from typing import Optional
+from albumentations import Compose 
         
 class celeba(Dataset):
     '''CelebA dataset'''
@@ -24,7 +26,7 @@ class celeba(Dataset):
         '''
         return len(self.image_names)
     
-    def __getitem__(self, index):
+    def __getitem__(self, index:int):
         '''
         Retrieves the image and annotation at given index
         '''
@@ -40,12 +42,9 @@ class celeba(Dataset):
         label = proc.to_tensor(label)
 
         return image, label
-    
-    def set_transform(self, transform):
-        self.transform = transform
 
 class datasetWithTransform(Dataset):
-    def __init__(self, dataset, transform):
+    def __init__(self, dataset:Dataset, transform:Optional[Compose]):
         self.dataset = dataset
         self.transform = transform
     
@@ -54,8 +53,10 @@ class datasetWithTransform(Dataset):
     
     def __getitem__(self, index):
         image, label = self.dataset[index]
-        image = image.permute(1,2,0).cpu().numpy()
-        image = self.transform(image=image)['image']
-        image = proc.to_tensor(image).permute(2,0,1)
+        
+        if self.transform:
+            image = image.permute(1,2,0).cpu().numpy()
+            image = self.transform(image=image)['image']
+            image = proc.to_tensor(image).permute(2,0,1)
 
         return image, label
