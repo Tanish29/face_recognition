@@ -16,39 +16,26 @@ class DETECTOR_NAMES(Enum):
     MEDIAPIPE = "mediapipe"
     HAARCASCADE = "haarcascade"
 
-class preprocessor():
-    def __init__(self, args):
-        self.args = args
+class PreProcessor():
+    def __init__(self, detection_model, resize_res):
+        self.detection_model = detection_model
+        self.resize_res = resize_res
     def __call__(self, image:np.ndarray):
         return self.process(image)
     def process(self, image):
         # crop 
-        detection_model = self.args["detection_model"]
-        if detection_model == DETECTOR_NAMES.MEDIAPIPE:
-            detection_confidence = self.args["detection_confidence"]
-            model_type = self.args["model_type"]
-            image = mediapipe_crop_image(image,detection_confidence,model_type)
-        elif detection_model == DETECTOR_NAMES.HAARCASCADE:
-            classifer_path = self.args["classifer_path"]
+        if self.detection_model == DETECTOR_NAMES.MEDIAPIPE:
+            confidence = 0.5
+            model_type = 1
+            image = mediapipe_crop_image(image,confidence,model_type)
+        elif self.detection_model == DETECTOR_NAMES.HAARCASCADE:
+            classifer_path = "resources/haarcascade_frontalface_default.xml"
             image = haarcascade_crop_image(image, classifer_path)
 
         # resize
-        resize_res = self.args["resize_res"]
-        image = cv2.resize(image, (resize_res,resize_res), interpolation=cv2.INTER_AREA) # reduced alising effects
+        image = cv2.resize(image, (self.resize_res,self.resize_res), interpolation=cv2.INTER_AREA) # reduced alising effects
         
         return image
-    
-def get_preprocessor_args(detection_model, resize_res):
-    args = {}
-    args["detection_model"] = detection_model
-    if detection_model == DETECTOR_NAMES.MEDIAPIPE:
-        args["detection_confidence"] = 0.5
-        args["model_type"] = 1
-    elif detection_model == DETECTOR_NAMES.HAARCASCADE:
-        args["classifer_path"] = "resources/haarcascade_frontalface_default.xml"
-    args["resize_res"] = resize_res
-
-    return args
 
 def mediapipe_crop_image(image, detection_confidence, model_type):
     face_detector = FaceDetection(detection_confidence, model_type)

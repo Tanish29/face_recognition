@@ -16,7 +16,7 @@ def get_dataset(dataset_name:DATASET_NAMES,
                 preprocessor:callable
                 ) -> Dataset:
     """
-    Returns the train, validation and test split from the given dataset
+    Returns requested dataset
 
     Args:
         dataset_name: name of the dataset to load, used to call relevant function.
