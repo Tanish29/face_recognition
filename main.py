@@ -34,16 +34,12 @@ args = {
     "image_dir":image_dir,
     "annotation_file":annotation_file,
     "reduce_size_to":REDUCE_SIZE_TO,
-    "train_test_split":TRAIN_TEST_SPLIT,
-    "train_val_split":TRAIN_VAL_SPLIT,
     "preprocessor":preprocessor,
-    "transform":None
 }
-train_df, val_df, test_df = get_dataset(**args)
+df = get_dataset(**args)
 
 ''' GET DATALOADER '''
-train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE,train_df,val_df,test_df)
+# train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE,train_df,val_df,test_df)
 
 ''' VIEW DATASET '''
-view_dataset(train_df, num_show=10, shuffle=False, df_name="Train")
-view_dataset(val_df, num_show=10, shuffle=True, df_name="val")
+view_dataset(df, num_show=10, shuffle=False, df_name="Whole Dataset")

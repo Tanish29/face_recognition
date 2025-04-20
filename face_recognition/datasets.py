@@ -12,11 +12,12 @@ class celeba(Dataset):
     def __init__(self, 
                  image_dir:str, 
                  annotation_file:str, 
-                 reduce_size_to:int, 
+                 reduce_size_to:Optional[int], 
                  preprocessor:callable) -> None:
         self.image_dir = image_dir
         self.image_names = os.listdir(image_dir)
-        self.image_names = np.random.choice(self.image_names, size=int(reduce_size_to*len(self.image_names)), replace=False)
+        if reduce_size_to is not None:
+            self.image_names = np.random.choice(self.image_names, size=int(reduce_size_to*len(self.image_names)), replace=False)
         self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
         self.preprocessor = preprocessor
     

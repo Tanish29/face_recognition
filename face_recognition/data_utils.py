@@ -12,11 +12,8 @@ class DATASET_NAMES(Enum):
 def get_dataset(dataset_name:DATASET_NAMES, 
                 image_dir:str, 
                 annotation_file:str,
-                reduce_size_to:float,
-                train_test_split:float,
-                train_val_split:float,
-                preprocessor:callable,
-                transform:Optional[Compose]
+                reduce_size_to:Optional[float],
+                preprocessor:callable
                 ) -> Dataset:
     """
     Returns the train, validation and test split from the given dataset
@@ -26,25 +23,23 @@ def get_dataset(dataset_name:DATASET_NAMES,
         image_dir: path to directory containing images 
         annotation_file: path to the annotation/label file 
         reduce_size_to: proportion of the whole dataset to keep (use arg if dataset is very large)
-        train_test_split: proportion of whole dataset to use for training (e.g., 0.8 means 80% of dataset for training data)
-        train_val_split: proportion of training data to use for validation
     """
     if dataset_name not in DATASET_NAMES:
         available_names = [enum.name for enum in DATASET_NAMES]
         raise ValueError(f"Provided dataset name is invalid, choose from these set of enums: {available_names}")
 
     # get train, val, test sizes
-    train_prop = train_val_split * train_test_split
-    val_prop = (1 - train_val_split) * train_test_split
-    test_prop = 1 - train_test_split
-
+    # train_prop = train_val_split * train_test_split
+    # val_prop = (1 - train_val_split) * train_test_split
+    # test_prop = 1 - train_test_split
+    
     if dataset_name == DATASET_NAMES.CELEBA: # celeba dataset 
-        dataset = celeba(image_dir, annotation_file, reduce_size_to, preprocessor)
+        df = celeba(image_dir, annotation_file, reduce_size_to, preprocessor)
 
-    train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
-    train_df = datasetWithTransform(train_df, transform)
+    # train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
+    # train_df = datasetWithTransform(train_df, transform)
 
-    return train_df, val_df, test_df
+    return df
 
 def get_dataloaders(batch_size,*datasets):
     loaders = []
