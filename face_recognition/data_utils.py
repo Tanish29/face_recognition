@@ -3,7 +3,6 @@ from torch.utils.data import Dataset, random_split, DataLoader
 from .datasets import *
 import plotly.express as px
 from tqdm import tqdm
-from . import processors as proc
 from albumentations import Compose
 from typing import Optional
 

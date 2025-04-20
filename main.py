@@ -1,14 +1,15 @@
 import yaml
 
-from src.utils import data_utils as du
-from src.utils import processors as proc
-from src.utils import transforms
+from face_recognition import DETECTOR_NAMES, get_preprocessor_args, preprocessor
+from face_recognition import DATASET_NAMES, get_dataset, get_dataloaders
+from face_recognition import view_dataset
+from face_recognition import get_albumentation_transform
 
 ''' GLOBAL VARIABLES '''
 TRAIN_TEST_SPLIT = 0.8
 TRAIN_VAL_SPLIT = 0.8
 REDUCE_SIZE_TO = 0.10
-DETECTOR = proc.DETECTOR_NAMES.MEDIAPIPE
+DETECTOR = DETECTOR_NAMES.MEDIAPIPE
 RESIZE_RES = 512
 BATCH_SIZE = 32
 
@@ -20,14 +21,14 @@ image_dir = config['image_dir'] # non-platform agnostic
 annotation_file = config['label_file']
 
 ''' PREPROCESS '''
-preprocessor_args = proc.get_preprocessor_args(DETECTOR,RESIZE_RES)
-preprocessor = proc.preprocessor(preprocessor_args)
+preprocessor_args = get_preprocessor_args(DETECTOR,RESIZE_RES)
+preprocessor = preprocessor(preprocessor_args)
 
 ''' AUGMENTATIONS '''
-transform = transforms.transform
+transform = get_albumentation_transform()
 
 ''' GET DATASET '''
-dataset_name = du.DATASET_NAMES.CELEBA
+dataset_name = DATASET_NAMES.CELEBA
 args = {
     "dataset_name":dataset_name,
     "image_dir":image_dir,
@@ -38,11 +39,11 @@ args = {
     "preprocessor":preprocessor,
     "transform":None
 }
-train_df, val_df, test_df = du.get_dataset(**args)
+train_df, val_df, test_df = get_dataset(**args)
 
 ''' GET DATALOADER '''
-train_dl, val_dl, test_dl = du.get_dataloaders(BATCH_SIZE,train_df,val_df,test_df)
+train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE,train_df,val_df,test_df)
 
 ''' VIEW DATASET '''
-du.view_dataset(train_df, num_show=10, shuffle=False, df_name="Train")
-du.view_dataset(val_df, num_show=10, shuffle=True, df_name="val")
+view_dataset(train_df, num_show=10, shuffle=False, df_name="Train")
+view_dataset(val_df, num_show=10, shuffle=True, df_name="val")

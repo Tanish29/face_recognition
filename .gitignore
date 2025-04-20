@@ -6,4 +6,4 @@ configs/
 
 # files
 *.docx
-scratch.py
+*scratch.py

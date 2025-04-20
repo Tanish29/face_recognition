@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from . import processors as proc
+from .processors import to_tensor
 
 import os
 import numpy as np
@@ -38,8 +38,8 @@ class celeba(Dataset):
 
         image = self.preprocessor(image)
 
-        image = proc.to_tensor(image).permute(2,0,1)
-        label = proc.to_tensor(label)
+        image = to_tensor(image).permute(2,0,1)
+        label = to_tensor(label)
 
         return image, label
 
@@ -57,6 +57,6 @@ class datasetWithTransform(Dataset):
         if self.transform:
             image = image.permute(1,2,0).cpu().numpy()
             image = self.transform(image=image)['image']
-            image = proc.to_tensor(image).permute(2,0,1)
+            image = to_tensor(image).permute(2,0,1)
 
         return image, label
