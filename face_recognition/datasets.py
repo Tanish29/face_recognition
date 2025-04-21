@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from .processors import to_tensor
+from .converters import to_tensor
 
 import os
 import numpy as np

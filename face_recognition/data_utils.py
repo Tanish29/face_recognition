@@ -1,10 +1,10 @@
 from enum import Enum
 from torch.utils.data import Dataset, random_split, DataLoader
 from .datasets import *
+from .transforms import get_augmented_wrapper
 import plotly.express as px
 from tqdm import tqdm
-from albumentations import Compose
-from typing import Optional
+from typing import Optional, Literal
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
@@ -49,10 +49,14 @@ def get_dataloaders(batch_size,*datasets):
     
     return loaders
 
+@get_augmented_wrapper
+def get_dataset_at_idx(dataset, idx):
+    return dataset[idx]
+
 def view_dataset(dataset:Dataset,
                  num_show:int, 
                  shuffle:bool,
-                 df_name:str):
+                 df_type:Literal['train','test','val',None]):
     num_images = len(dataset)
     if num_show==-1: num_show = num_images
 
@@ -64,8 +68,8 @@ def view_dataset(dataset:Dataset,
     num_cols = 5
     face_ids = []
     print(f"Plotting Images")
-    for counter, idx in enumerate(tqdm(indices, total=len(indices))):
-        image_id = dataset[idx]
+    for counter, idx in enumerate(tqdm(indices)):
+        image_id = get_dataset_at_idx(dataset,idx)
         image_np = image_id[0].permute(1,2,0).cpu().numpy()
         image_np = np.expand_dims(image_np, axis=0)
         # face_ids.append(image_id[1])
@@ -77,7 +81,7 @@ def view_dataset(dataset:Dataset,
     
     fig = px.imshow(images_np, 
                     animation_frame=0, 
-                    title=f"Viewing {num_show} images from {df_name} dataset")
+                    title=f"Viewing {num_show} images from {df_type} dataset")
     fig.update_layout(xaxis_visible=False,
                       yaxis_visible=False)
     # for i in range(10): fig.layout.annotations[i]["text"] = f"id: {face_ids[i]}"

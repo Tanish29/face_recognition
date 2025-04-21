@@ -1,15 +1,14 @@
 import yaml
 
 from face_recognition import DETECTOR_NAMES, PreProcessor
-from face_recognition import DATASET_NAMES, get_dataset, get_dataloaders
+from face_recognition import DATASET_NAMES, get_dataset
 from face_recognition import view_dataset
-from face_recognition import get_albumentation_transform
 
 ''' GLOBAL VARIABLES '''
 TRAIN_TEST_SPLIT = 0.8
 TRAIN_VAL_SPLIT = 0.8
 REDUCE_SIZE_TO = 0.10
-DETECTOR = DETECTOR_NAMES.HAARCASCADE
+DETECTOR = DETECTOR_NAMES.MEDIAPIPE
 RESIZE_RES = 512
 BATCH_SIZE = 32
 
@@ -23,9 +22,6 @@ annotation_file = config['label_file']
 ''' PREPROCESS '''
 preprocessor = PreProcessor(DETECTOR, RESIZE_RES)
 
-''' AUGMENTATIONS '''
-transform = get_albumentation_transform()
-
 ''' GET DATASET '''
 dataset_name = DATASET_NAMES.CELEBA
 args = {
@@ -37,8 +33,5 @@ args = {
 }
 df = get_dataset(**args)
 
-''' GET DATALOADER '''
-# train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE,train_df,val_df,test_df)
-
 ''' VIEW DATASET '''
-view_dataset(df, num_show=10, shuffle=True, df_name="Whole Dataset")
+view_dataset(df, num_show=10, shuffle=True, df_type="train")
