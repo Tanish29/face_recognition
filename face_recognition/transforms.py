@@ -1,6 +1,6 @@
 import albumentations as abm
 import cv2
-import torch
+import numpy as np
 from .converters import to_tensor
 
 transform = abm.Compose([
@@ -11,12 +11,6 @@ transform = abm.Compose([
         abm.ShiftScaleRotate(border_mode=cv2.BORDER_CONSTANT,p=1.0), # shift-scale-rotate
     ])
 
-def get_augmented_wrapper(f):
-    def wrapper(*args,**kwargs):
-        out = f(*args)
-        image = out[0].cpu().numpy()
-        image = transform(image=image)["image"]
-        image = to_tensor(image)
-        return *(image,out[1]),
+def augment_image(image:np.array):
+    return transform(image=image)["image"]
 
-    return wrapper

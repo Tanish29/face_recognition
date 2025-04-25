@@ -21,15 +21,18 @@ class PreProcessor():
         if self.detection_model == DETECTOR_NAMES.MEDIAPIPE:
             confidence = 0.5
             model_type = 1
-            image = mediapipe_crop_image(image,confidence,model_type)
+            image_cropped = mediapipe_crop_image(image,confidence,model_type)
         elif self.detection_model == DETECTOR_NAMES.HAARCASCADE:
             classifer_path = "resources/haarcascade_frontalface_default.xml"
-            image = haarcascade_crop_image(image, classifer_path)
+            image_cropped = haarcascade_crop_image(image, classifer_path)
+
+        if image_cropped.size == 0:
+            image_cropped = image
 
         # resize
-        image = cv2.resize(image, (self.resize_res,self.resize_res), interpolation=cv2.INTER_AREA) # reduced alising effects
+        image_resized = cv2.resize(image_cropped, (self.resize_res,self.resize_res), interpolation=cv2.INTER_AREA) # reduced alising effects
         
-        return image
+        return image_resized
 
 def mediapipe_crop_image(image, detection_confidence, model_type):
     face_detector = FaceDetection(detection_confidence, model_type)

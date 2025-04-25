@@ -34,7 +34,7 @@ class celeba(Dataset):
         image_name = self.image_names[index]
         full_path = os.path.join(self.image_dir, image_name)
 
-        image = cv2.imread(full_path, cv2.IMREAD_COLOR_RGB) # read image as tensor
+        image = cv2.imread(full_path, cv2.IMREAD_COLOR_RGB) # read image 
         label = int(self.image_labels[index,1]) # get person's identity (images and annotations are ordered)
 
         image = self.preprocessor(image)
