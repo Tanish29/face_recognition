@@ -26,9 +26,8 @@ preprocessor = PreProcessor(DETECTOR, RESIZE_RES)
 dataset_name = DATASET_NAMES.CELEBA
 args = {
     "dataset_name": dataset_name,
-    "image_dir": image_dir,
-    "annotation_file": annotation_file,
-    "reduce_size_to": REDUCE_SIZE_TO,
+    "image_paths": image_paths,
+    "image_labels": image_labels,
     "preprocessor": preprocessor,
 }
 df = get_dataset(**args)

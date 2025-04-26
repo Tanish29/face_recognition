@@ -13,9 +13,8 @@ class DATASET_NAMES(Enum):
 
 def get_dataset(
     dataset_name: DATASET_NAMES,
-    image_dir: str,
-    annotation_file: str,
-    reduce_size_to: Optional[float],
+    image_paths: list[str],
+    image_labels: list[int],
     preprocessor: callable,
 ) -> Dataset:
     """
@@ -39,7 +38,7 @@ def get_dataset(
     # test_prop = 1 - train_test_split
 
     if dataset_name == DATASET_NAMES.CELEBA:  # celeba dataset
-        df = celeba(image_dir, annotation_file, reduce_size_to, preprocessor)
+        df = CelebA(image_paths, image_labels, preprocessor)
 
     # train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
     # train_df = datasetWithTransform(train_df, transform)

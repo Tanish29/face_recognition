@@ -8,44 +8,40 @@ from .converters import to_tensor
 from .io import load_image
 
 
-class celeba(Dataset):
+class CelebA(Dataset):
     """CelebA dataset"""
 
     def __init__(
         self,
-        image_dir: str,
-        annotation_file: str,
-        reduce_size_to: Optional[int],
+        image_paths: list[str],
+        image_labels: list[int],
         preprocessor: callable,
     ) -> None:
-        self.image_dir = image_dir
-        self.image_names = os.listdir(image_dir)
-        if reduce_size_to is not None:
-            self.image_names = np.random.choice(
-                self.image_names,
-                size=int(reduce_size_to * len(self.image_names)),
-                replace=False,
-            )
-        self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
+        self.image_paths = image_paths
+        # if reduce_size_to is not None:
+        #     self.image_names = np.random.choice(
+        #         self.image_names,
+        #         size=int(reduce_size_to * len(self.image_names)),
+        #         replace=False,
+        #     )
+        # self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
+        self.image_labels = image_labels
         self.preprocessor = preprocessor
 
     def __len__(self):
         """
         Returns the number of images
         """
-        return len(self.image_names)
+        return len(self.image_paths)
 
     def __getitem__(self, index: int):
         """
-        Retrieves the image and annotation at given index
+        Retrieves the image and label at given index
         """
-        image_name = self.image_names[index]
-        full_path = os.path.join(self.image_dir, image_name)
+        image_path = self.image_paths[index]
+        label: int = self.image_labels[index] # person's identity (images and annotations are ordered)
 
-        image: np.ndarray = load_image(full_path)
-        label = int(
-            self.image_labels[index, 1]
-        )  # get person's identity (images and annotations are ordered)
+        image: np.ndarray = load_image(image_path)
 
         # image = self.preprocessor(image)
 
