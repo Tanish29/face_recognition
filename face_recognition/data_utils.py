@@ -4,11 +4,33 @@ from .datasets import *
 from .transforms import augment_image
 import plotly.express as px
 from tqdm import tqdm
-from typing import Optional, Literal
+from typing import Optional, Literal, List, Tuple
+import os
+from .parser import get_stem
 
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
+
+
+def get_dataset_split(
+    image_dir: str, annotation_file: str
+) -> Tuple[List[str], List[int]]:
+    files = os.listdir(image_dir)
+    labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
+    labels = {get_stem(labels[i, 0]): int(labels[i, 1]) for i in range(labels.shape[0])}
+
+    image_paths = []
+    image_labels = []
+
+    for file in tqdm(files, desc="Getting Image Paths & Labels"):
+        if file.endswith((".png", ".jpg")):
+            label = labels.get(get_stem(file))
+            if label != None:
+                image_paths.append(os.path.join(image_dir, file))
+                image_labels.append(label)
+
+    return image_paths, image_labels
 
 
 def get_dataset(

@@ -24,7 +24,6 @@ class CelebA(Dataset):
         #         size=int(reduce_size_to * len(self.image_names)),
         #         replace=False,
         #     )
-        # self.image_labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
         self.image_labels = image_labels
         self.preprocessor = preprocessor
 
@@ -39,7 +38,9 @@ class CelebA(Dataset):
         Retrieves the image and label at given index
         """
         image_path = self.image_paths[index]
-        label: int = self.image_labels[index] # person's identity (images and annotations are ordered)
+        label: int = self.image_labels[
+            index
+        ]  # person's identity (images and annotations are ordered)
 
         image: np.ndarray = load_image(image_path)
 

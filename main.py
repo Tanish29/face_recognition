@@ -1,7 +1,7 @@
 import yaml
 
 from face_recognition import DETECTOR_NAMES, PreProcessor
-from face_recognition import DATASET_NAMES, get_dataset
+from face_recognition import DATASET_NAMES, get_dataset, get_dataset_split
 from face_recognition import view_dataset, summarise_dataset
 
 """ GLOBAL VARIABLES """
@@ -21,6 +21,9 @@ annotation_file = config["label_file"]
 
 """ PREPROCESS """
 preprocessor = PreProcessor(DETECTOR, RESIZE_RES)
+
+""" DATASET SPLIT """
+image_paths, image_labels = get_dataset_split(image_dir, annotation_file)
 
 """ GET DATASET """
 dataset_name = DATASET_NAMES.CELEBA
