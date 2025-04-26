@@ -1,4 +1,4 @@
-# Face Recognition in Python
+# Face Recognition in Python (Ongoing)
 This repository contains code that loads in the `CELEBA` dataset and trains a deep learning model to identiy the trained faces to a high accuracy. Furthermore after training the best model is validated. 
 
 There is a main file that performs the key steps in a deep learning project. To run that file create a local clone of the repository and follow the instructions below.
