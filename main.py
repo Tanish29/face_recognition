@@ -7,7 +7,7 @@ from face_recognition import view_dataset, summarise_dataset
 """ GLOBAL VARIABLES """
 TRAIN_TEST_SPLIT = 0.8
 TRAIN_VAL_SPLIT = 0.8
-REDUCE_SIZE_TO = 0.001
+REDUCE_SIZE_TO = 1.0
 DETECTOR = DETECTOR_NAMES.MEDIAPIPE
 RESIZE_RES = 512
 BATCH_SIZE = 32
@@ -37,5 +37,5 @@ df = get_dataset(**args)
 summarise_dataset(df)
 
 """ VIEW DATASET """
-view_dataset(df, num_show=10, shuffle=False, df_type="train")
-view_dataset(df, num_show=10, shuffle=False, df_type="val")
+# view_dataset(df, num_show=10, shuffle=False, df_type="train")
+# view_dataset(df, num_show=10, shuffle=False, df_type="val")

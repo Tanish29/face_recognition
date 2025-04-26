@@ -42,17 +42,17 @@ class celeba(Dataset):
         image_name = self.image_names[index]
         full_path = os.path.join(self.image_dir, image_name)
 
-        image = cv2.imread(full_path, cv2.IMREAD_COLOR_RGB)  # read image
+        # image = cv2.imread(full_path, cv2.IMREAD_COLOR_RGB)  # read image
         label = int(
             self.image_labels[index, 1]
         )  # get person's identity (images and annotations are ordered)
 
-        image = self.preprocessor(image)
+        # image = self.preprocessor(image)
 
-        image = to_tensor(image).permute(2, 0, 1)
-        label = to_tensor(label)
+        # image = to_tensor(image).permute(2, 0, 1)
+        # label = to_tensor(label)
 
-        return image, label
+        return full_path, label
 
 
 class datasetWithTransform(Dataset):

@@ -61,7 +61,7 @@ def summarise_dataset(dataset: Dataset):
 
     labels = list(
         tqdm(
-            map(lambda x: dataset[x][1].item(), range(num_images)),
+            map(lambda x: dataset[x][1], range(num_images)),
             total=num_images,
             desc=f"Retrieving labels for {num_images} images",
         )
