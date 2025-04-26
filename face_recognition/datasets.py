@@ -1,11 +1,11 @@
 from torch.utils.data import Dataset
-from .converters import to_tensor
-
 import os
 import numpy as np
-import cv2
 from typing import Optional
 from albumentations import Compose
+
+from .converters import to_tensor
+from .io import load_image
 
 
 class celeba(Dataset):
@@ -42,7 +42,7 @@ class celeba(Dataset):
         image_name = self.image_names[index]
         full_path = os.path.join(self.image_dir, image_name)
 
-        # image = cv2.imread(full_path, cv2.IMREAD_COLOR_RGB)  # read image
+        image: np.ndarray = load_image(full_path)
         label = int(
             self.image_labels[index, 1]
         )  # get person's identity (images and annotations are ordered)
@@ -52,7 +52,7 @@ class celeba(Dataset):
         # image = to_tensor(image).permute(2, 0, 1)
         # label = to_tensor(label)
 
-        return full_path, label
+        return image, label
 
 
 class datasetWithTransform(Dataset):

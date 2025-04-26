@@ -7,7 +7,7 @@ from face_recognition import view_dataset, summarise_dataset
 """ GLOBAL VARIABLES """
 TRAIN_TEST_SPLIT = 0.8
 TRAIN_VAL_SPLIT = 0.8
-REDUCE_SIZE_TO = 1.0
+REDUCE_SIZE_TO = 0.1
 DETECTOR = DETECTOR_NAMES.MEDIAPIPE
 RESIZE_RES = 512
 BATCH_SIZE = 32
