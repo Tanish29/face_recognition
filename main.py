@@ -36,7 +36,7 @@ args = {
 df = get_dataset(**args)
 
 """ SUMMARISE DATASET """
-summarise_dataset(df)
+summarise_dataset(image_labels)
 
 """ VIEW DATASET """
 # view_dataset(df, num_show=10, shuffle=False, df_type="train")

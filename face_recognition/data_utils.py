@@ -77,24 +77,13 @@ def get_dataloaders(batch_size, *datasets):
     return loaders
 
 
-def summarise_dataset(dataset: Dataset):
-    num_images = len(dataset)
-
-    labels = list(
-        tqdm(
-            map(lambda x: dataset[x][1], range(num_images)),
-            total=num_images,
-            desc=f"Retrieving labels for {num_images} images",
-        )
-    )
-
-    fig = px.histogram(
+def summarise_dataset(labels: List[int]):
+    px.histogram(
         {"ID": labels},
         x="ID",
-        nbins=num_images,
+        nbins=len(labels),
         title="Distribution of Unique People in Dataset",
-    )
-    fig.show()
+    ).show()
 
 
 def get_dataset_at_idx(dataset, idx, augment=False):
