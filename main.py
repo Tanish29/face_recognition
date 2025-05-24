@@ -46,6 +46,7 @@ df = get_dataset(
 
 """ Split dataset """
 train_df, val_df, test_df = split_dataset(df)
-print("hello world")
 
+""" Get Dataloaders """
+train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE, train_df, val_df, test_df)
 
