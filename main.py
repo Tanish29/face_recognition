@@ -26,25 +26,26 @@ annotation_file = config["label_file"]
 """ PREPROCESS """
 preprocessor = PreProcessor(DETECTOR, RESIZE_RES)
 
-""" DATASET SPLIT """
-image_paths, image_labels = get_image_paths_labels(image_dir, annotation_file)
+""" get image paths and labels """
+img_paths, img_labels = get_image_paths_labels(image_dir, annotation_file)
 
-""" GET DATASET """
-dataset_name = DATASET_NAMES.CELEBA
-args = {
-    "dataset_name": dataset_name,
-    "image_paths": image_paths,
-    "image_labels": image_labels,
-    "preprocessor": preprocessor,
-}
-df = get_dataset(**args)
+""" Get Dataset """
+df = get_dataset(
+    dataset_name=DATASET_NAMES.CELEBA,
+    img_paths=img_paths,
+    img_labels=img_labels,
+    preprocessor=preprocessor
+)
 
 """ SUMMARISE DATASET """
-summarise_dataset(image_labels)
+# summarise_dataset(img_labels)
 
 """ VIEW DATASET """
-view_dataset(df, num_show=10, shuffle=False, df_type="train")
-view_dataset(df, num_show=10, shuffle=False, df_type="val")
+# view_dataset(df, num_show=10, shuffle=False, df_type="train")
+# view_dataset(df, num_show=10, shuffle=False, df_type="val")
 
 """ Split dataset """
 train_df, val_df, test_df = split_dataset(df)
+print("hello world")
+
+

@@ -13,7 +13,8 @@ class DATASET_NAMES(Enum):
 
 
 def get_image_paths_labels(
-    image_dir: str, annotation_file: str
+    image_dir: str, 
+    annotation_file: str
 ) -> Tuple[List[str], List[int]]:
     _ = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
 
@@ -30,8 +31,8 @@ def get_image_paths_labels(
 
 def get_dataset(
     dataset_name: DATASET_NAMES,
-    image_paths: list[str],
-    image_labels: list[int],
+    img_paths: list[str],
+    img_labels: list[int],
     preprocessor: callable,
 ) -> Dataset:
     """
@@ -39,9 +40,9 @@ def get_dataset(
 
     Args:
         dataset_name: name of the dataset to load, used to call relevant function.
-        image_dir: path to directory containing images
-        annotation_file: path to the annotation/label file
-        reduce_size_to: proportion of the whole dataset to keep (use arg if dataset is very large)
+        img_paths: list of image file paths.
+        img_labels: list of corresponding image labels.
+        preprocessor: function to preprocess an image
     """
     if dataset_name not in DATASET_NAMES:
         available_names = [enum.name for enum in DATASET_NAMES]
@@ -50,7 +51,7 @@ def get_dataset(
         )
 
     if dataset_name == DATASET_NAMES.CELEBA:  # celeba dataset
-        df = CelebA(image_paths, image_labels, preprocessor)
+        df = CelebA(img_paths, img_labels, preprocessor)
 
     return df
 
