@@ -22,15 +22,19 @@ class PreProcessor:
 
     def process(self, image):
         # crop
-        if self.detection_model == DETECTOR_NAMES.MEDIAPIPE:
-            confidence = 0.5
-            model_type = 1
-            image_cropped = mediapipe_crop_image(image, confidence, model_type)
-        elif self.detection_model == DETECTOR_NAMES.HAARCASCADE:
-            classifer_path = "resources/haarcascade_frontalface_default.xml"
-            image_cropped = haarcascade_crop_image(image, classifer_path)
+        try:
+            if self.detection_model == DETECTOR_NAMES.MEDIAPIPE:
+                confidence = 0.5
+                model_type = 1
+                image_cropped = mediapipe_crop_image(image, confidence, model_type)
+            elif self.detection_model == DETECTOR_NAMES.HAARCASCADE:
+                classifer_path = "resources/haarcascade_frontalface_default.xml"
+                image_cropped = haarcascade_crop_image(image, classifer_path)
 
-        if image_cropped.size == 0:
+            if image_cropped.size == 0:
+                image_cropped = image
+        except Exception as e:
+            print(f"Error during cropping: {e}. Skipping step.")
             image_cropped = image
 
         # resize

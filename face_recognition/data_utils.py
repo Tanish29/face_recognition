@@ -5,9 +5,7 @@ from .transforms import augment_image
 import plotly.express as px
 from tqdm import tqdm
 from typing import Optional, Literal, List, Tuple
-import os
-from .parser import get_stem
-from multiprocessing import Pool
+import os.path as osp
 
 
 class DATASET_NAMES(Enum):
@@ -17,23 +15,17 @@ class DATASET_NAMES(Enum):
 def get_image_paths_labels(
     image_dir: str, annotation_file: str
 ) -> Tuple[List[str], List[int]]:
-    files = os.listdir(image_dir)
-    labels = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
-    labels = {get_stem(labels[i, 0]): int(labels[i, 1]) for i in range(labels.shape[0])}
+    _ = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
 
-    image_paths = []
-    image_labels = []
-
-    for file in tqdm(files, desc="Getting Image Paths & Labels"):
-        if file.endswith((".png", ".jpg")):
-            label = labels.get(get_stem(file))
-            if label != None:
-                image_paths.append(os.path.join(image_dir, file))
-                image_labels.append(label)
-
+    img_paths = image_dir + osp.sep + _[:, 0]
+    labels = _[:, 1].astype(int)
     
+    valids = np.vectorize(
+        lambda fp: osp.exists(fp) and fp.endswith((".png", ".jpg")),
+        otypes=[bool]
+    )(img_paths)
 
-    return image_paths, image_labels
+    return img_paths[valids].tolist(), labels[valids].tolist()
 
 
 def get_dataset(
