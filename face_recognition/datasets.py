@@ -44,7 +44,7 @@ class CelebA(Dataset):
 
         image: np.ndarray = load_image(image_path)
 
-        # image = self.preprocessor(image)
+        image = self.preprocessor(image)
 
         # image = to_tensor(image).permute(2, 0, 1)
         # label = to_tensor(label)

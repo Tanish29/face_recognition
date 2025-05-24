@@ -7,13 +7,14 @@ from tqdm import tqdm
 from typing import Optional, Literal, List, Tuple
 import os
 from .parser import get_stem
+from multiprocessing import Pool
 
 
 class DATASET_NAMES(Enum):
     CELEBA = 0
 
 
-def get_dataset_split(
+def get_image_paths_labels(
     image_dir: str, annotation_file: str
 ) -> Tuple[List[str], List[int]]:
     files = os.listdir(image_dir)
@@ -29,6 +30,8 @@ def get_dataset_split(
             if label != None:
                 image_paths.append(os.path.join(image_dir, file))
                 image_labels.append(label)
+
+    
 
     return image_paths, image_labels
 
@@ -54,18 +57,21 @@ def get_dataset(
             f"Provided dataset name is invalid, choose from these set of enums: {available_names}"
         )
 
-    # get train, val, test sizes
-    # train_prop = train_val_split * train_test_split
-    # val_prop = (1 - train_val_split) * train_test_split
-    # test_prop = 1 - train_test_split
-
     if dataset_name == DATASET_NAMES.CELEBA:  # celeba dataset
         df = CelebA(image_paths, image_labels, preprocessor)
 
-    # train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
-    # train_df = datasetWithTransform(train_df, transform)
-
     return df
+
+def split_dataset(dataset, train_prop=0.7, val_prop=0.15, test_prop=0.15):
+    """
+    Splits the dataset into train, validation, and test sets.
+    Args:
+        dataset: The dataset to split
+        train_prop: Proportion of dataset to use for training
+        val_prop: Proportion of dataset to use for validation
+        test_prop: Proportion of dataset to use for testing
+    """
+    return random_split(dataset, [train_prop, val_prop, test_prop])
 
 
 def get_dataloaders(batch_size, *datasets):
@@ -88,8 +94,10 @@ def summarise_dataset(labels: List[int]):
 
 def get_dataset_at_idx(dataset, idx, augment=False):
     image_id = dataset[idx]
-    image = image_id[0].permute(1, 2, 0).cpu().numpy()
-    iid = image_id[1].item()
+    image = image_id[0]
+    iid = image_id[1]
+    # image = image_id[0].permute(1, 2, 0).cpu().numpy()
+    # iid = image_id[1].item()
 
     if augment:
         image = augment_image(image)
