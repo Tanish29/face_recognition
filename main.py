@@ -38,11 +38,11 @@ df = get_dataset(
 )
 
 """ SUMMARISE DATASET """
-# summarise_dataset(img_labels)
+summarise_dataset(img_labels)
 
 """ VIEW DATASET """
-# view_dataset(df, num_show=10, shuffle=False, df_type="train")
-# view_dataset(df, num_show=10, shuffle=False, df_type="val")
+view_dataset(df, num_show=10, shuffle=False, df_type="train")
+view_dataset(df, num_show=10, shuffle=False, df_type="val")
 
 """ Split dataset """
 train_df, val_df, test_df = split_dataset(df)

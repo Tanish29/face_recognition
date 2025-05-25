@@ -85,19 +85,6 @@ def summarise_dataset(labels: List[int]):
     ).show()
 
 
-def get_dataset_at_idx(dataset, idx, augment=False):
-    image_id = dataset[idx]
-    image = image_id[0]
-    iid = image_id[1]
-    # image = image_id[0].permute(1, 2, 0).cpu().numpy()
-    # iid = image_id[1].item()
-
-    if augment:
-        image = augment_image(image)
-
-    return image, iid
-
-
 def view_dataset(
     dataset: Dataset,
     num_show: int,
@@ -105,34 +92,39 @@ def view_dataset(
     df_type: Literal["train", "test", "val", None],
 ):
     num_images = len(dataset)
-    if num_show == -1:
-        num_show = num_images
-
     if shuffle:
         indices = np.random.randint(0, num_images, num_show)
     else:
+        if num_show > num_images:
+            raise ValueError(
+                f"num_show ({num_show}) cannot be greater than the dataset size ({num_images})"
+            )
         indices = range(num_show)
 
-    num_cols = 5
-    face_ids = []
-    augment = True if df_type == "train" else False
-
-    for counter, idx in enumerate(tqdm(indices, desc=f"Plotting")):
-        image, iid = get_dataset_at_idx(dataset, idx, augment=augment)
+    images = np.empty((0, 3, 512, 512, 3), dtype=np.uint8)
+    labels = np.zeros((num_show, 3), dtype=np.int64)
+    for idx in tqdm(indices, total=num_show, desc=f"Plotting {df_type} dataset"):
+        (anchor, label), (positive, plabel), (negative, nlabel) = dataset.get_item(idx, return_labels=True)
+        # load images
+        anchor = np.expand_dims(anchor, axis=0)
+        positive = np.expand_dims(positive, axis=0)
+        negative = np.expand_dims(negative, axis=0)
+        image = np.concatenate((anchor, positive, negative), axis=0)
         image = np.expand_dims(image, axis=0)
-        # face_ids.append(image_id[1])
-
-        if counter == 0:
-            images = image
-        else:
-            images = np.concatenate([image, images], axis=0)
+        images = np.concatenate([image, images], axis=0)
+        # labels
+        labels[idx, :] = [label, plabel, nlabel]
 
     fig = px.imshow(
         images,
         animation_frame=0,
+        facet_col=1,
         title=f"Viewing {num_show} images from {df_type} dataset",
     )
     fig.update_layout(xaxis_visible=False, yaxis_visible=False)
-    # for i in range(10): fig.layout.annotations[i]["text"] = f"id: {face_ids[i]}"
-
+    fig.layout.annotations[0]["text"] = "Anchor"
+    fig.layout.annotations[1]["text"] = "Positive"
+    fig.layout.annotations[2]["text"] = "Negative"
     fig.show()
+
+    print(f"Labels for {df_type} dataset: {labels}")

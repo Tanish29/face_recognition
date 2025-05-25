@@ -1,5 +1,4 @@
 from torch.utils.data import Dataset
-import os
 import numpy as np
 from typing import Optional
 from albumentations import Compose
@@ -20,38 +19,47 @@ class CelebA(Dataset):
         self.img_labels = img_labels
         self.preprocessor = preprocessor
     
-    def get_triplet(self, index: int) -> tuple[str]:
+    def get_triplet(self, index: int, return_labels=False) -> tuple[str]:
         # max number of triplets for random generation is len(self.img_paths)
         if index >= len(self.img_paths):
             raise IndexError(f"Index {index} out of bounds for triplet retrieval.")
-        
+
         img_labels = np.array(self.img_labels)
         img_paths = np.array(self.img_paths)
-        indices = img_labels == self.img_labels[index]
-        # remove self from positives
-        indices[index] = False
-        if not np.any(indices):
+
+        label = img_labels[index]
+        pos_indices = img_labels == label # remove self from positives
+        pos_indices[index] = False
+        if not np.any(pos_indices):
             raise ValueError(f"No positive samples found for index: {index}")
-        positives = img_paths[indices]
-        # add self back 
-        indices[index] = True
-        if not np.any(~indices):
+
+        neg_indices = ~pos_indices
+        neg_indices[index] = False # add self back
+        if not np.any(neg_indices):
             raise ValueError(f"No negative samples found for index: {index}")
-        negatives = img_paths[~indices]
+
+        anchor = img_paths[index]
+
+        positives = img_paths[pos_indices]
+        pos_idx = np.random.randint(0, len(positives))
+        positive = positives[pos_idx]
+
+        negatives = img_paths[neg_indices]
+        neg_idx = np.random.randint(0, len(negatives))
+        negative = negatives[neg_idx]
         
-        return img_paths[index], np.random.choice(positives), np.random.choice(negatives)
+        if return_labels:
+            plabel = img_labels[pos_indices][pos_idx]
+            nlabel = img_labels[neg_indices][neg_idx]
+            return (anchor, label), (positive, plabel), (negative, nlabel)
+        return anchor, positive, negative
+    
+    def get_item(self, index: int, return_labels=False) -> tuple[np.ndarray, str]:
+        if return_labels:
+            (anchor, label), (positive, plabel), (negative, nlabel) = self.get_triplet(index, return_labels=return_labels)
+        else:
+            anchor, positive, negative = self.get_triplet(index)
 
-    def __len__(self):
-        """
-        Returns the number of images
-        """
-        return len(self.img_paths)
-
-    def __getitem__(self, index: int):
-        """
-        Retrieves the image and label at given index
-        """
-        anchor, positive, negative = self.get_triplet(index)
         # load images
         anchor: np.ndarray = load_image(anchor)
         positive: np.ndarray = load_image(positive)
@@ -66,7 +74,21 @@ class CelebA(Dataset):
         # positive = to_tensor(positive).permute(2, 0, 1)
         # negative = to_tensor(negative).permute(2, 0, 1)
 
+        if return_labels:
+            return (anchor, label), (positive, plabel), (negative, nlabel)
         return anchor, positive, negative
+
+    def __len__(self):
+        """
+        Returns the number of images.
+        """
+        return len(self.img_paths)
+
+    def __getitem__(self, index: int):
+        """
+        Retrieves the anchor, positive and negative images for given index.
+        """
+        return self.get_item(index)
 
 
 class datasetWithTransform(Dataset):
