@@ -3,12 +3,9 @@ from .data_utils import (
     get_image_paths_labels,
     get_dataset,
     get_dataloaders,
-    split_dataset
+    split_dataset,
 )
-from .data_utils import (
-    view_dataset,
-    summarise_dataset
-)
+from .data_utils import view_dataset, summarise_dataset
 from .processors import DETECTOR_NAMES, PreProcessor
 
 __all__ = [

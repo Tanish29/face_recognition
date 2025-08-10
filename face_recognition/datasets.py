@@ -6,6 +6,7 @@ from albumentations import Compose
 from .converters import to_tensor
 from .io import load_image
 
+
 class CelebA(Dataset):
     """CelebA dataset"""
 
@@ -18,7 +19,7 @@ class CelebA(Dataset):
         self.img_paths = img_paths
         self.img_labels = img_labels
         self.preprocessor = preprocessor
-    
+
     def get_triplet(self, index: int, return_labels=False) -> tuple[str]:
         # max number of triplets for random generation is len(self.img_paths)
         if index >= len(self.img_paths):
@@ -28,13 +29,13 @@ class CelebA(Dataset):
         img_paths = np.array(self.img_paths)
 
         label = img_labels[index]
-        pos_indices = img_labels == label # remove self from positives
+        pos_indices = img_labels == label  # remove self from positives
         pos_indices[index] = False
         if not np.any(pos_indices):
             raise ValueError(f"No positive samples found for index: {index}")
 
         neg_indices = ~pos_indices
-        neg_indices[index] = False # add self back
+        neg_indices[index] = False  # add self back
         if not np.any(neg_indices):
             raise ValueError(f"No negative samples found for index: {index}")
 
@@ -47,16 +48,18 @@ class CelebA(Dataset):
         negatives = img_paths[neg_indices]
         neg_idx = np.random.randint(0, len(negatives))
         negative = negatives[neg_idx]
-        
+
         if return_labels:
             plabel = img_labels[pos_indices][pos_idx]
             nlabel = img_labels[neg_indices][neg_idx]
             return (anchor, label), (positive, plabel), (negative, nlabel)
         return anchor, positive, negative
-    
+
     def get_item(self, index: int, return_labels=False) -> tuple[np.ndarray, str]:
         if return_labels:
-            (anchor, label), (positive, plabel), (negative, nlabel) = self.get_triplet(index, return_labels=return_labels)
+            (anchor, label), (positive, plabel), (negative, nlabel) = self.get_triplet(
+                index, return_labels=return_labels
+            )
         else:
             anchor, positive, negative = self.get_triplet(index)
 

@@ -5,7 +5,7 @@ from face_recognition import (
     get_dataset,
     get_image_paths_labels,
     get_dataloaders,
-    split_dataset
+    split_dataset,
 )
 from face_recognition import DETECTOR_NAMES, PreProcessor
 from face_recognition import view_dataset, summarise_dataset
@@ -34,7 +34,7 @@ df = get_dataset(
     dataset_name=DATASET_NAMES.CELEBA,
     img_paths=img_paths,
     img_labels=img_labels,
-    preprocessor=preprocessor
+    preprocessor=preprocessor,
 )
 
 """ SUMMARISE DATASET """
@@ -49,4 +49,3 @@ train_df, val_df, test_df = split_dataset(df)
 
 """ Get Dataloaders """
 train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE, train_df, val_df, test_df)
-

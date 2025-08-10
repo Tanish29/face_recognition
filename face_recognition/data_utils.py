@@ -13,17 +13,15 @@ class DATASET_NAMES(Enum):
 
 
 def get_image_paths_labels(
-    image_dir: str, 
-    annotation_file: str
+    image_dir: str, annotation_file: str
 ) -> Tuple[List[str], List[int]]:
     _ = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
 
     img_paths = image_dir + osp.sep + _[:, 0]
     labels = _[:, 1].astype(int)
-    
+
     valids = np.vectorize(
-        lambda fp: osp.exists(fp) and fp.endswith((".png", ".jpg")),
-        otypes=[bool]
+        lambda fp: osp.exists(fp) and fp.endswith((".png", ".jpg")), otypes=[bool]
     )(img_paths)
 
     return img_paths[valids].tolist(), labels[valids].tolist()
@@ -54,6 +52,7 @@ def get_dataset(
         df = CelebA(img_paths, img_labels, preprocessor)
 
     return df
+
 
 def split_dataset(dataset, train_prop=0.7, val_prop=0.15, test_prop=0.15):
     """
@@ -104,7 +103,9 @@ def view_dataset(
     images = np.empty((0, 3, 512, 512, 3), dtype=np.uint8)
     labels = np.zeros((num_show, 3), dtype=np.int64)
     for idx in tqdm(indices, total=num_show, desc=f"Plotting {df_type} dataset"):
-        (anchor, label), (positive, plabel), (negative, nlabel) = dataset.get_item(idx, return_labels=True)
+        (anchor, label), (positive, plabel), (negative, nlabel) = dataset.get_item(
+            idx, return_labels=True
+        )
         # load images
         anchor = np.expand_dims(anchor, axis=0)
         positive = np.expand_dims(positive, axis=0)
