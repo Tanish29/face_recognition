@@ -27,7 +27,7 @@ def get_image_paths_labels(
     return img_paths[valids].tolist(), labels[valids].tolist()
 
 
-def get_dataset(
+def load_dataset(
     dataset_name: DATASET_NAMES,
     img_paths: list[str],
     img_labels: list[int],
