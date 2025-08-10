@@ -4,6 +4,7 @@ __pycache__/
 configs/*
 !configs/example_config.yml
 misc/
+*.egg*
 
 # files
 *scratch.py
