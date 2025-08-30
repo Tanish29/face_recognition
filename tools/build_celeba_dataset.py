@@ -5,29 +5,30 @@ import logging
 from py7zr import SevenZipFile
 from py7zr.callbacks import ExtractCallback
 import os
-from tqdm import tqdm 
+from tqdm import tqdm
 import multivolumefile
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+
 class ExtractProgress(ExtractCallback):
     def __init__(self, total_files, lim):
         self.pbar = tqdm(total=total_files, desc="Extracting")
         self.lim = lim
-    
+
     def report_update(self, *args, **kwargs):
         self.pbar.update(1)
         if self.pbar.n == self.lim:
             log.info(f"Exiting, extracted {self.lim} images")
             os._exit(0)
-    
+
     def report_start(self, *args, **kwargs):
         return super().report_start(*args, **kwargs)
-    
+
     def report_end(self, *args, **kwargs):
         return super().report_end(*args, **kwargs)
-    
+
     def report_postprocess(self, *args, **kwargs):
         return super().report_postprocess(*args, **kwargs)
 
@@ -36,6 +37,7 @@ class ExtractProgress(ExtractCallback):
 
     def report_warning(self, *args, **kwargs):
         return super().report_warning(*args, **kwargs)
+
 
 @click.command()
 @click.option(
@@ -80,8 +82,8 @@ def build_celeba_dataset(out_dir, n):
     if not (out_dir / "img_celeba").exists():
         log.info("Extracting Images...")
         example_7z = zip_dir / "img_celeba.7z"
-        with multivolumefile.open(example_7z, mode='rb') as target_archive:
-            with SevenZipFile(target_archive, 'r') as archive:
+        with multivolumefile.open(example_7z, mode="rb") as target_archive:
+            with SevenZipFile(target_archive, "r") as archive:
                 num_imgs = len(archive.getnames())
                 archive.extractall(path=out_dir, callback=ExtractProgress(num_imgs, n))
 
