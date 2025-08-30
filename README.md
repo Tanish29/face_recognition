@@ -30,4 +30,10 @@ This project supports [uv](https://docs.astral.sh/uv/getting-started/installatio
    pip install .
    ```
 
+## Dataset
+Next to download and process the CELEBA dataset simply run the build script via this command:
+```
+python -m tools.build_celeba_dataset --out-dir dataset/celeba
+```
+**NB: This may take a couple of minutes.**
 

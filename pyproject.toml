@@ -15,6 +15,9 @@ dependencies = [
     "tqdm",
     "mediapipe",
     "albumentations",
+    "click",
+    "gdown",
+    "py7zr"
 ]
 [project.optional-dependencies]
 dev = [
