@@ -7,15 +7,20 @@ from face_recognition import (
 )
 from face_recognition import DETECTOR_NAMES, PreProcessor
 from face_recognition import view_dataset, summarise_dataset
+from face_recognition.nets import SimpleNet
+from face_recognition import Trainer
+import torch
+from torch import optim
+from torch import nn
 
 """ Configuration """
-REDUCE_SIZE_TO = 0.1
-DETECTOR = DETECTOR_NAMES.MEDIAPIPE
+DETECTOR = DETECTOR_NAMES.HAARCASCADE
 RESIZE_RES = 512
-BATCH_SIZE = 32
+BATCH_SIZE = 2
 IMAGE_DIR = "dataset/celeba/img_celeba"
 LABEL_FILE = "dataset/celeba/annotations/identity_CelebA.txt"
-DEVICE = "cpu"
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+EPOCHS = 1
 
 """ PREPROCESS """
 preprocessor = PreProcessor(DETECTOR, RESIZE_RES)
@@ -43,3 +48,21 @@ view_dataset(df, num_show=10, shuffle=False, df_type="val")
 
 """ Get Dataloaders """
 train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE, train_df, val_df, test_df)
+
+""" Prepare For Training """
+net = SimpleNet().to(DEVICE)
+dummy_params = nn.Parameter(torch.zeros(1))  # to avoid error in optimisers
+optimiser = optim.SGD(net.parameters(), lr=1e-2)
+loss_fn = nn.TripletMarginLoss()
+
+""" Train """
+trainer = Trainer()
+trainer.train(
+    EPOCHS,
+    DEVICE,
+    net,
+    train_dl,
+    val_dl,
+    optimiser,
+    loss_fn,
+)

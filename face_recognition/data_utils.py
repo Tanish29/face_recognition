@@ -68,10 +68,10 @@ def split_dataset(dataset, train_prop=0.7, val_prop=0.15, test_prop=0.15):
     return random_split(dataset, [train_prop, val_prop, test_prop])
 
 
-def get_dataloaders(batch_size, *datasets):
+def get_dataloaders(batch_size, *datasets, **kwargs):
     loaders = []
     for dataset in datasets:
-        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, **kwargs)
         loaders.append(loader)
 
     return loaders
