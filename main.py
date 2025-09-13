@@ -13,8 +13,8 @@ REDUCE_SIZE_TO = 0.1
 DETECTOR = DETECTOR_NAMES.MEDIAPIPE
 RESIZE_RES = 512
 BATCH_SIZE = 32
-IMAGE_DIR = ""
-LABEL_FILE = ""
+IMAGE_DIR = "dataset/celeba/img_celeba"
+LABEL_FILE = "dataset/celeba/annotations/identity_CelebA.txt"
 DEVICE = "cpu"
 
 """ PREPROCESS """

@@ -6,6 +6,7 @@ import plotly.express as px
 from tqdm import tqdm
 from typing import Optional, Literal, List, Tuple
 import os.path as osp
+import pandas as pd
 
 
 class DATASET_NAMES(Enum):
@@ -15,16 +16,17 @@ class DATASET_NAMES(Enum):
 def get_image_paths_labels(
     image_dir: str, annotation_file: str
 ) -> Tuple[List[str], List[int]]:
-    _ = np.loadtxt(annotation_file, delimiter=" ", dtype=str)
+    labels = pd.read_csv(
+        annotation_file, sep=" ", header=None, names=["filename", "label"], dtype=str
+    )
+    img_paths = image_dir + osp.sep + labels.filename
+    labels = labels.label.astype(np.int32)
+    assert (
+        img_paths.size == labels.size
+    ), "Number of image paths and labels must be the same"
+    valids = img_paths.apply(lambda x: osp.exists(x) and x.endswith((".png", ".jpg")))
 
-    img_paths = image_dir + osp.sep + _[:, 0]
-    labels = _[:, 1].astype(int)
-
-    valids = np.vectorize(
-        lambda fp: osp.exists(fp) and fp.endswith((".png", ".jpg")), otypes=[bool]
-    )(img_paths)
-
-    return img_paths[valids].tolist(), labels[valids].tolist()
+    return img_paths[valids].to_list(), labels[valids].to_list()
 
 
 def load_dataset(
