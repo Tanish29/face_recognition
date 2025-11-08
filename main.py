@@ -14,7 +14,7 @@ from torch import optim
 from torch import nn
 
 """ Configuration """
-DETECTOR = DETECTOR_NAMES.HAARCASCADE
+DETECTOR = DETECTOR_NAMES.MEDIAPIPE
 RESIZE_RES = 512
 BATCH_SIZE = 2
 IMAGE_DIR = "dataset/celeba/img_celeba"
@@ -43,8 +43,8 @@ summarise_dataset(img_labs)
 train_df, val_df, test_df = split_dataset(df)
 
 """ View Dataset """
-view_dataset(df, num_show=10, shuffle=False, df_type="train")
-view_dataset(df, num_show=10, shuffle=False, df_type="val")
+view_dataset(train_df, num_show=10, shuffle=False, df_type="train")
+view_dataset(val_df, num_show=10, shuffle=False, df_type="val")
 
 """ Get Dataloaders """
 train_dl, val_dl, test_dl = get_dataloaders(BATCH_SIZE, train_df, val_df, test_df)

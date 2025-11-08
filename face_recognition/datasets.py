@@ -22,36 +22,32 @@ class CelebA(Dataset):
 
     def get_triplet(self, index: int, return_labels=False) -> tuple[str]:
         # max number of triplets for random generation is len(self.img_paths)
-        if index >= len(self.img_paths):
+        if index >= self.__len__():
             raise IndexError(f"Index {index} out of bounds for triplet retrieval.")
 
         img_labels = np.array(self.img_labels)
         img_paths = np.array(self.img_paths)
 
         label = img_labels[index]
-        pos_indices = img_labels == label  # remove self from positives
-        pos_indices[index] = False
-        if not np.any(pos_indices):
-            raise ValueError(f"No positive samples found for index: {index}")
+        pos_indices: np.ndarray = img_labels == label
+        pos_indices[index] = False # remove self from positives
+        if not pos_indices.any():
+            print(f"No positive samples found for index: {index}, using self as positive")
+            pos_indices[index] = True
 
-        neg_indices = ~pos_indices
-        neg_indices[index] = False  # add self back
-        if not np.any(neg_indices):
-            raise ValueError(f"No negative samples found for index: {index}")
+        neg_indices: np.ndarray = ~pos_indices
+        neg_indices[index] = False  # remove self from negatives
+        if not neg_indices.any():
+            print(f"No negative samples found for index: {index}, using self as negative")
+            neg_indices[index] = True
 
         anchor = img_paths[index]
-
-        positives = img_paths[pos_indices]
-        pos_idx = np.random.randint(0, len(positives))
-        positive = positives[pos_idx]
-
-        negatives = img_paths[neg_indices]
-        neg_idx = np.random.randint(0, len(negatives))
-        negative = negatives[neg_idx]
+        positives = tuple(zip(img_paths[pos_indices], img_labels[pos_indices]))
+        positive, plabel = positives[np.random.choice(len(positives))]
+        negatives = tuple(zip(img_paths[neg_indices], img_labels[neg_indices]))
+        negative, nlabel = negatives[np.random.choice(len(negatives))]
 
         if return_labels:
-            plabel = img_labels[pos_indices][pos_idx]
-            nlabel = img_labels[neg_indices][neg_idx]
             return (anchor, label), (positive, plabel), (negative, nlabel)
         return anchor, positive, negative
 
