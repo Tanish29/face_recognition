@@ -4,9 +4,10 @@ from .datasets import *
 from .transforms import augment_image
 import plotly.express as px
 from tqdm import tqdm
-from typing import Optional, Literal, List, Tuple
+from typing import Literal, List, Tuple
 import os.path as osp
 import pandas as pd
+from copy import deepcopy
 
 
 class DATASET_NAMES(Enum):
@@ -65,7 +66,22 @@ def split_dataset(dataset, train_prop=0.7, val_prop=0.15, test_prop=0.15):
         val_prop: Proportion of dataset to use for validation
         test_prop: Proportion of dataset to use for testing
     """
-    return random_split(dataset, [train_prop, val_prop, test_prop])
+    # NOTE: Subsets share the dataset variables
+    train_df, val_df, test_df = random_split(dataset, [train_prop, val_prop, test_prop])
+    if isinstance(dataset, CelebA):
+        train_df = deepcopy(train_df)
+        val_df = deepcopy(val_df)
+        test_df = deepcopy(test_df)
+        img_labels = np.array(dataset.img_labels)
+        img_paths = np.array(dataset.img_paths)
+        train_df.dataset.img_labels = img_labels[train_df.indices].copy().tolist()
+        train_df.dataset.img_paths = img_paths[train_df.indices].copy().tolist()
+        val_df.dataset.img_labels = img_labels[val_df.indices].copy().tolist()
+        val_df.dataset.img_paths = img_paths[val_df.indices].copy().tolist()
+        test_df.dataset.img_labels = img_labels[test_df.indices].copy().tolist()
+        test_df.dataset.img_paths = img_paths[test_df.indices].copy().tolist()
+        return train_df.dataset, val_df.dataset, test_df.dataset
+    raise NotImplementedError("Dataset splitting not implemented for this dataset type.")
 
 
 def get_dataloaders(batch_size, *datasets, **kwargs):
