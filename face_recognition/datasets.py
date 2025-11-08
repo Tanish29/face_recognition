@@ -5,7 +5,7 @@ from albumentations import Compose
 
 from .converters import to_tensor
 from .io import load_image
-
+import copy
 
 class CelebA(Dataset):
     """CelebA dataset"""
@@ -88,6 +88,14 @@ class CelebA(Dataset):
         Retrieves the anchor, positive and negative images for given index.
         """
         return self.get_item(index)
+    
+    def __deepcopy__(self, memo):
+        # Create a deep copy of the dataset
+        return CelebA(
+            copy.deepcopy(self.img_paths, memo),
+            copy.deepcopy(self.img_labels, memo),
+            self.preprocessor # non-picklable, use reference
+        )
 
 
 class datasetWithTransform(Dataset):

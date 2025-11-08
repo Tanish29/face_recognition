@@ -13,9 +13,15 @@ class DETECTOR_NAMES(Enum):
 
 
 class PreProcessor:
-    def __init__(self, detection_model, resize_res):
+    def __init__(self, detection_model, resize_res, classifer_path=None):
         self.detection_model = detection_model
         self.resize_res = resize_res
+        if self.detection_model == DETECTOR_NAMES.MEDIAPIPE:
+            self.face_detector = FaceDetection(0.5, 1)
+        elif self.detection_model == DETECTOR_NAMES.HAARCASCADE:
+            self.classifier = cv2.CascadeClassifier()
+            if not self.classifier.load(classifer_path):
+                raise ValueError(f"Error: failed to load face classifier")
 
     def __call__(self, image: np.ndarray):
         return self.process(image)
@@ -24,12 +30,9 @@ class PreProcessor:
         # crop
         try:
             if self.detection_model == DETECTOR_NAMES.MEDIAPIPE:
-                confidence = 0.5
-                model_type = 1
-                image_cropped = mediapipe_crop_image(image, confidence, model_type)
+                image_cropped = self.mediapipe_crop_image(image)
             elif self.detection_model == DETECTOR_NAMES.HAARCASCADE:
-                classifer_path = "resources/haarcascade_frontalface_default.xml"
-                image_cropped = haarcascade_crop_image(image, classifer_path)
+                image_cropped = self.haarcascade_crop_image(image)
 
             if image_cropped.size == 0:
                 image_cropped = image
@@ -47,47 +50,40 @@ class PreProcessor:
         return image_resized
 
 
-def mediapipe_crop_image(image, detection_confidence, model_type):
-    face_detector = FaceDetection(detection_confidence, model_type)
-    results = face_detector.process(image)
-    faces = results.detections
+    def mediapipe_crop_image(self, image):
+        results = self.face_detector.process(image)
+        faces = results.detections
 
-    if faces is None:
-        print(f"Log: No faces detected returning unchanged image")
+        if faces is None:
+            print(f"Log: No faces detected returning unchanged image")
+            return image
+
+        h, w, _ = image.shape  # (H,W,C)
+        for face in faces:
+            bbox = face.location_data.relative_bounding_box
+            x, y, w, h = (
+                int(bbox.xmin * w),
+                int(bbox.ymin * h),
+                int(bbox.width * w),
+                int(bbox.height * h),
+            )
+            # image = cv2.rectangle(image, (x,y), (x+w,y+h), (0,255,0), 2)
+            image = image[y : y + h, x : x + w]
+
         return image
 
-    h, w, _ = image.shape  # (H,W,C)
-    for face in faces:
-        bbox = face.location_data.relative_bounding_box
-        x, y, w, h = (
-            int(bbox.xmin * w),
-            int(bbox.ymin * h),
-            int(bbox.width * w),
-            int(bbox.height * h),
-        )
-        # image = cv2.rectangle(image, (x,y), (x+w,y+h), (0,255,0), 2)
-        image = image[y : y + h, x : x + w]
 
-    return image
+    def haarcascade_crop_image(self, image):
+        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image_gray = cv2.equalizeHist(image_gray)
 
+        faces = self.classifier.detectMultiScale(image_gray)
+        for face in faces:
+            x, y, w, h = face
+            # image = cv2.rectangle(image, (x,y), (x+w,y+h), (0,255,0), 2)
+            image = image[y : y + h, x : x + w]
 
-def haarcascade_crop_image(image, classifer_path):
-    classifier = cv2.CascadeClassifier()
-
-    if not classifier.load(classifer_path):
-        print(f"Error: failed to load face classifier")
         return image
-
-    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    image_gray = cv2.equalizeHist(image_gray)
-
-    faces = classifier.detectMultiScale(image_gray)
-    for face in faces:
-        x, y, w, h = face
-        # image = cv2.rectangle(image, (x,y), (x+w,y+h), (0,255,0), 2)
-        image = image[y : y + h, x : x + w]
-
-    return image
 
 
 def normalise(image, mean, std):
