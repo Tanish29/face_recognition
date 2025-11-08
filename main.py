@@ -14,7 +14,7 @@ from torch import optim
 from torch import nn
 
 """ Configuration """
-DETECTOR = DETECTOR_NAMES.MEDIAPIPE # choose face detector
+DETECTOR = DETECTOR_NAMES.MEDIAPIPE  # choose face detector
 RESIZE_RES = 512
 BATCH_SIZE = 2
 IMAGE_DIR = "dataset/celeba/img_celeba"
@@ -22,7 +22,9 @@ LABEL_FILE = "dataset/celeba/annotations/identity_CelebA.txt"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EPOCHS = 1
 SHOW_DATASET = True
-CLASSIFIER_PATH = "resources/haarcascade_frontalface_default.xml" # only needed for HAARCASCADE
+CLASSIFIER_PATH = (
+    "resources/haarcascade_frontalface_default.xml"  # only needed for HAARCASCADE
+)
 
 """ PREPROCESS """
 preprocessor = PreProcessor(DETECTOR, RESIZE_RES, CLASSIFIER_PATH)

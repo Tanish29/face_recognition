@@ -7,6 +7,7 @@ from .converters import to_tensor
 from .io import load_image
 import copy
 
+
 class CelebA(Dataset):
     """CelebA dataset"""
 
@@ -30,15 +31,19 @@ class CelebA(Dataset):
 
         label = img_labels[index]
         pos_indices: np.ndarray = img_labels == label
-        pos_indices[index] = False # remove self from positives
+        pos_indices[index] = False  # remove self from positives
         if not pos_indices.any():
-            print(f"No positive samples found for index: {index}, using self as positive")
+            print(
+                f"No positive samples found for index: {index}, using self as positive"
+            )
             pos_indices[index] = True
 
         neg_indices: np.ndarray = ~pos_indices
         neg_indices[index] = False  # remove self from negatives
         if not neg_indices.any():
-            print(f"No negative samples found for index: {index}, using self as negative")
+            print(
+                f"No negative samples found for index: {index}, using self as negative"
+            )
             neg_indices[index] = True
 
         anchor = img_paths[index]
@@ -88,13 +93,13 @@ class CelebA(Dataset):
         Retrieves the anchor, positive and negative images for given index.
         """
         return self.get_item(index)
-    
+
     def __deepcopy__(self, memo):
         # Create a deep copy of the dataset
         return CelebA(
             copy.deepcopy(self.img_paths, memo),
             copy.deepcopy(self.img_labels, memo),
-            self.preprocessor # non-picklable, use reference
+            self.preprocessor,  # non-picklable, use reference
         )
 
 

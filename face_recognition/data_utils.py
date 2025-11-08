@@ -81,7 +81,9 @@ def split_dataset(dataset, train_prop=0.7, val_prop=0.15, test_prop=0.15):
         test_df.dataset.img_labels = img_labels[test_df.indices].copy().tolist()
         test_df.dataset.img_paths = img_paths[test_df.indices].copy().tolist()
         return train_df.dataset, val_df.dataset, test_df.dataset
-    raise NotImplementedError("Dataset splitting not implemented for this dataset type.")
+    raise NotImplementedError(
+        "Dataset splitting not implemented for this dataset type."
+    )
 
 
 def get_dataloaders(batch_size, *datasets, **kwargs):

@@ -49,7 +49,6 @@ class PreProcessor:
 
         return image_resized
 
-
     def mediapipe_crop_image(self, image):
         results = self.face_detector.process(image)
         faces = results.detections
@@ -71,7 +70,6 @@ class PreProcessor:
             image = image[y : y + h, x : x + w]
 
         return image
-
 
     def haarcascade_crop_image(self, image):
         image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
